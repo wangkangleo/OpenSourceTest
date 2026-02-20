@@ -1,0 +1,8 @@
+env = Environment(CCFLAGS = '-g')   #全局环境变量
+
+env.Program("App","./main.cpp",CCFLAGS = '-g') #也可以单独指定环境
+
+bld = Builder
+{
+    
+}
