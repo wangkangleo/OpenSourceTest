@@ -5,7 +5,9 @@ objroot=$1
 cat <<EOF
 #ifndef JEMALLOC_H_
 #define JEMALLOC_H_
-#pragma GCC system_header
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 EOF
 
@@ -18,5 +20,8 @@ for hdr in jemalloc_defs.h jemalloc_rename.h jemalloc_macros.h \
 done
 
 cat <<EOF
+#ifdef __cplusplus
+}
+#endif
 #endif /* JEMALLOC_H_ */
 EOF

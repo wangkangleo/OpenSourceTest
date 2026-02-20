@@ -6,13 +6,25 @@
 #include "jemalloc/internal/sc.h"
 #include "jemalloc/internal/witness.h"
 
-#ifdef JEMALLOC_JET
-unsigned bin_batching_test_ndalloc_slabs_max = (unsigned)-1;
-void (*bin_batching_test_after_push_hook)(size_t push_idx);
-void (*bin_batching_test_mid_pop_hook)(size_t nelems_to_pop);
-void (*bin_batching_test_after_unlock_hook)(unsigned slab_dalloc_count,
-    bool list_empty);
-#endif
+bin_info_t bin_infos[SC_NBINS];
+
+static void
+bin_infos_init(sc_data_t *sc_data, unsigned bin_shard_sizes[SC_NBINS],
+    bin_info_t bin_infos[SC_NBINS]) {
+	for (unsigned i = 0; i < SC_NBINS; i++) {
+		bin_info_t *bin_info = &bin_infos[i];
+		sc_t *sc = &sc_data->sc[i];
+		bin_info->reg_size = ((size_t)1U << sc->lg_base)
+		    + ((size_t)sc->ndelta << sc->lg_delta);
+		bin_info->slab_size = (sc->pgs << LG_PAGE);
+		bin_info->nregs =
+		    (uint32_t)(bin_info->slab_size / bin_info->reg_size);
+		bin_info->n_shards = bin_shard_sizes[i];
+		bitmap_info_t bitmap_info = BITMAP_INFO_INITIALIZER(
+		    bin_info->nregs);
+		bin_info->bitmap_info = bitmap_info;
+	}
+}
 
 bool
 bin_update_shard_size(unsigned bin_shard_sizes[SC_NBINS], size_t start_size,
@@ -46,64 +58,38 @@ bin_shard_sizes_boot(unsigned bin_shard_sizes[SC_NBINS]) {
 	}
 }
 
+void
+bin_boot(sc_data_t *sc_data, unsigned bin_shard_sizes[SC_NBINS]) {
+	assert(sc_data->initialized);
+	bin_infos_init(sc_data, bin_shard_sizes, bin_infos);
+}
+
 bool
-bin_init(bin_t *bin, unsigned binind) {
+bin_init(bin_t *bin) {
 	if (malloc_mutex_init(&bin->lock, "bin", WITNESS_RANK_BIN,
 	    malloc_mutex_rank_exclusive)) {
 		return true;
 	}
 	bin->slabcur = NULL;
-	edata_heap_new(&bin->slabs_nonfull);
-	edata_list_active_init(&bin->slabs_full);
+	extent_heap_new(&bin->slabs_nonfull);
+	extent_list_init(&bin->slabs_full);
 	if (config_stats) {
 		memset(&bin->stats, 0, sizeof(bin_stats_t));
-	}
-	if (arena_bin_has_batch(binind)) {
-		bin_with_batch_t *batched_bin = (bin_with_batch_t *)bin;
-		batcher_init(&batched_bin->remote_frees,
-		    opt_bin_info_remote_free_max);
 	}
 	return false;
 }
 
 void
-bin_prefork(tsdn_t *tsdn, bin_t *bin, bool has_batch) {
+bin_prefork(tsdn_t *tsdn, bin_t *bin) {
 	malloc_mutex_prefork(tsdn, &bin->lock);
-	if (has_batch) {
-		/*
-		 * The batch mutex has lower rank than the bin mutex (as it must
-		 * -- it's acquired later).  But during forking, we go
-		 *  bin-at-a-time, so that we acquire mutex on bin 0, then on
-		 *  the bin 0 batcher, then on bin 1.  This is a safe ordering
-		 *  (it's ordered by the index of arenas and bins within those
-		 *  arenas), but will trigger witness errors that would
-		 *  otherwise force another level of arena forking that breaks
-		 *  bin encapsulation (because the witness API doesn't "know"
-		 *  about arena or bin ordering -- it just sees that the batcher
-		 *  has a lower rank than the bin).  So instead we exclude the
-		 *  batcher mutex from witness checking during fork (which is
-		 *  the only time we touch multiple bins at once) by passing
-		 *  TSDN_NULL.
-		 */
-		bin_with_batch_t *batched = (bin_with_batch_t *)bin;
-		batcher_prefork(TSDN_NULL, &batched->remote_frees);
-	}
 }
 
 void
-bin_postfork_parent(tsdn_t *tsdn, bin_t *bin, bool has_batch) {
+bin_postfork_parent(tsdn_t *tsdn, bin_t *bin) {
 	malloc_mutex_postfork_parent(tsdn, &bin->lock);
-	if (has_batch) {
-		bin_with_batch_t *batched = (bin_with_batch_t *)bin;
-		batcher_postfork_parent(TSDN_NULL, &batched->remote_frees);
-	}
 }
 
 void
-bin_postfork_child(tsdn_t *tsdn, bin_t *bin, bool has_batch) {
+bin_postfork_child(tsdn_t *tsdn, bin_t *bin) {
 	malloc_mutex_postfork_child(tsdn, &bin->lock);
-	if (has_batch) {
-		bin_with_batch_t *batched = (bin_with_batch_t *)bin;
-		batcher_postfork_child(TSDN_NULL, &batched->remote_frees);
-	}
 }

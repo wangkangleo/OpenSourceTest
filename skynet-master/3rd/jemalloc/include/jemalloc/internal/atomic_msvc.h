@@ -1,10 +1,6 @@
 #ifndef JEMALLOC_INTERNAL_ATOMIC_MSVC_H
 #define JEMALLOC_INTERNAL_ATOMIC_MSVC_H
 
-#include "jemalloc/internal/jemalloc_preamble.h"
-
-#define ATOMIC_INLINE JEMALLOC_ALWAYS_INLINE
-
 #define ATOMIC_INIT(...) {__VA_ARGS__}
 
 typedef enum {
@@ -118,7 +114,6 @@ atomic_compare_exchange_strong_##short_type(atomic_##short_type##_t *a,	\
 }
 
 
-/* clang-format off */
 #define JEMALLOC_GENERATE_INT_ATOMICS(type, short_type, lg_size)	\
 JEMALLOC_GENERATE_ATOMICS(type, short_type, lg_size)			\
 									\
@@ -159,8 +154,5 @@ atomic_fetch_xor_##short_type(atomic_##short_type##_t *a,		\
 	return (type)ATOMIC_INTERLOCKED_NAME(_InterlockedXor, lg_size)(	\
 	    &a->repr, (ATOMIC_INTERLOCKED_REPR(lg_size))val);		\
 }
-/* clang-format on */
-
-#undef ATOMIC_INLINE
 
 #endif /* JEMALLOC_INTERNAL_ATOMIC_MSVC_H */

@@ -19,7 +19,7 @@ static seq_hooks_t hooks[HOOK_MAX];
 static malloc_mutex_t hooks_mu;
 
 bool
-hook_boot(void) {
+hook_boot() {
 	return malloc_mutex_init(&hooks_mu, "hooks", WITNESS_RANK_HOOK,
 	    malloc_mutex_rank_exclusive);
 }
@@ -100,7 +100,7 @@ for (int for_each_hook_counter = 0;					\
 }
 
 static bool *
-hook_reentrantp(void) {
+hook_reentrantp() {
 	/*
 	 * We prevent user reentrancy within hooks.  This is basically just a
 	 * thread-local bool that triggers an early-exit.
@@ -130,9 +130,9 @@ hook_reentrantp(void) {
 	 */
 	static bool in_hook_global = true;
 	tsdn_t *tsdn = tsdn_fetch();
-	bool *in_hook = tsdn_in_hookp_get(tsdn);
-	if (in_hook!= NULL) {
-		return in_hook;
+	tcache_t *tcache = tsdn_tcachep_get(tsdn);
+	if (tcache != NULL) {
+		return &tcache->in_hook;
 	}
 	return &in_hook_global;
 }

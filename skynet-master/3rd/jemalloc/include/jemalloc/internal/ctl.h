@@ -1,10 +1,6 @@
 #ifndef JEMALLOC_INTERNAL_CTL_H
 #define JEMALLOC_INTERNAL_CTL_H
 
-#include "jemalloc/internal/jemalloc_preamble.h"
-#include "jemalloc/internal/arena_stats.h"
-#include "jemalloc/internal/background_thread_structs.h"
-#include "jemalloc/internal/bin_stats.h"
 #include "jemalloc/internal/jemalloc_internal_types.h"
 #include "jemalloc/internal/malloc_io.h"
 #include "jemalloc/internal/mutex_prof.h"
@@ -14,7 +10,6 @@
 
 /* Maximum ctl tree depth. */
 #define CTL_MAX_DEPTH	7
-#define CTL_MULTI_SETTING_MAX_LEN 1000
 
 typedef struct ctl_node_s {
 	bool named;
@@ -47,19 +42,15 @@ typedef struct ctl_arena_stats_s {
 	uint64_t nfills_small;
 	uint64_t nflushes_small;
 
-	bin_stats_data_t bstats[SC_NBINS];
+	bin_stats_t bstats[SC_NBINS];
 	arena_stats_large_t lstats[SC_NSIZES - SC_NBINS];
-	pac_estats_t estats[SC_NPSIZES];
-	hpa_shard_stats_t hpastats;
-	sec_stats_t secstats;
+	arena_stats_extents_t estats[SC_NPSIZES];
 } ctl_arena_stats_t;
 
 typedef struct ctl_stats_s {
 	size_t allocated;
 	size_t active;
 	size_t metadata;
-	size_t metadata_edata;
-	size_t metadata_rtree;
 	size_t metadata_thp;
 	size_t resident;
 	size_t mapped;
@@ -105,17 +96,13 @@ typedef struct ctl_arenas_s {
 int ctl_byname(tsd_t *tsd, const char *name, void *oldp, size_t *oldlenp,
     void *newp, size_t newlen);
 int ctl_nametomib(tsd_t *tsd, const char *name, size_t *mibp, size_t *miblenp);
+
 int ctl_bymib(tsd_t *tsd, const size_t *mib, size_t miblen, void *oldp,
     size_t *oldlenp, void *newp, size_t newlen);
-int ctl_mibnametomib(tsd_t *tsd, size_t *mib, size_t miblen, const char *name,
-    size_t *miblenp);
-int ctl_bymibname(tsd_t *tsd, size_t *mib, size_t miblen, const char *name,
-    size_t *miblenp, void *oldp, size_t *oldlenp, void *newp, size_t newlen);
 bool ctl_boot(void);
 void ctl_prefork(tsdn_t *tsdn);
 void ctl_postfork_parent(tsdn_t *tsdn);
 void ctl_postfork_child(tsdn_t *tsdn);
-void ctl_mtx_assert_held(tsdn_t *tsdn);
 
 #define xmallctl(name, oldp, oldlenp, newp, newlen) do {		\
 	if (je_mallctl(name, oldp, oldlenp, newp, newlen)		\
@@ -140,25 +127,6 @@ void ctl_mtx_assert_held(tsdn_t *tsdn);
 	    newlen) != 0) {						\
 		malloc_write(						\
 		    "<jemalloc>: Failure in xmallctlbymib()\n");	\
-		abort();						\
-	}								\
-} while (0)
-
-#define xmallctlmibnametomib(mib, miblen, name, miblenp) do {		\
-	if (ctl_mibnametomib(tsd_fetch(), mib, miblen, name, miblenp)	\
-	    != 0) {							\
-		malloc_write(						\
-		    "<jemalloc>: Failure in ctl_mibnametomib()\n");	\
-		abort();						\
-	}								\
-} while (0)
-
-#define xmallctlbymibname(mib, miblen, name, miblenp, oldp, oldlenp,	\
-    newp, newlen) do {							\
-	if (ctl_bymibname(tsd_fetch(), mib, miblen, name, miblenp,	\
-	    oldp, oldlenp, newp, newlen) != 0) {			\
-		malloc_write(						\
-		    "<jemalloc>: Failure in ctl_bymibname()\n");	\
 		abort();						\
 	}								\
 } while (0)

@@ -1,10 +1,6 @@
 #ifndef JEMALLOC_INTERNAL_ATOMIC_GCC_SYNC_H
 #define JEMALLOC_INTERNAL_ATOMIC_GCC_SYNC_H
 
-#include "jemalloc/internal/jemalloc_preamble.h"
-
-#define ATOMIC_INLINE JEMALLOC_ALWAYS_INLINE
-
 #define ATOMIC_INIT(...) {__VA_ARGS__}
 
 typedef enum {
@@ -87,7 +83,6 @@ atomic_post_sc_store_fence() {
 
 }
 
-/* clang-format off */
 #define JEMALLOC_GENERATE_ATOMICS(type, short_type,			\
     /* unused */ lg_size)						\
 typedef struct {							\
@@ -162,7 +157,6 @@ atomic_compare_exchange_strong_##short_type(atomic_##short_type##_t *a,	\
 		return false;						\
 	}								\
 }
-/* clang-format on */
 
 #define JEMALLOC_GENERATE_INT_ATOMICS(type, short_type,			\
     /* unused */ lg_size)						\
@@ -197,7 +191,5 @@ atomic_fetch_xor_##short_type(atomic_##short_type##_t *a, type val,	\
     atomic_memory_order_t mo) {						\
 	return __sync_fetch_and_xor(&a->repr, val);			\
 }
-
-#undef ATOMIC_INLINE
 
 #endif /* JEMALLOC_INTERNAL_ATOMIC_GCC_SYNC_H */

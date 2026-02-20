@@ -3,10 +3,6 @@
 #endif
 #define JEMALLOC_INTERNAL_TSD_MALLOC_THREAD_CLEANUP_H
 
-#include "jemalloc/internal/jemalloc_preamble.h"
-#include "jemalloc/internal/tsd_internals.h"
-#include "jemalloc/internal/tsd_types.h"
-
 #define JEMALLOC_TSD_TYPE_ATTR(type) __thread type JEMALLOC_TLS_MODEL
 
 extern JEMALLOC_TSD_TYPE_ATTR(tsd_t) tsd_tls;
@@ -25,7 +21,7 @@ tsd_cleanup_wrapper(void) {
 
 JEMALLOC_ALWAYS_INLINE bool
 tsd_boot0(void) {
-	_malloc_tsd_cleanup_register(&tsd_cleanup_wrapper);
+	malloc_tsd_cleanup_register(&tsd_cleanup_wrapper);
 	tsd_booted = true;
 	return false;
 }

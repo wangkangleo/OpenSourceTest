@@ -1,7 +1,6 @@
 #ifndef JEMALLOC_INTERNAL_ATOMIC_C11_H
 #define JEMALLOC_INTERNAL_ATOMIC_C11_H
 
-#include "jemalloc/internal/jemalloc_preamble.h"
 #include <stdatomic.h>
 
 #define ATOMIC_INIT(...) ATOMIC_VAR_INIT(__VA_ARGS__)
@@ -15,7 +14,6 @@
 
 #define atomic_fence atomic_thread_fence
 
-/* clang-format off */
 #define JEMALLOC_GENERATE_ATOMICS(type, short_type,			\
     /* unused */ lg_size)						\
 typedef _Atomic(type) atomic_##short_type##_t;				\
@@ -60,7 +58,6 @@ atomic_compare_exchange_strong_##short_type(atomic_##short_type##_t *a,	\
 	return atomic_compare_exchange_strong_explicit(a, expected,	\
 	    desired, success_mo, failure_mo);				\
 }
-/* clang-format on */
 
 /*
  * Integral types have some special operations available that non-integral ones

@@ -24,24 +24,17 @@
 #  ifdef __arm__
 #    define LG_QUANTUM		3
 #  endif
-#  if defined(__aarch64__) || defined(_M_ARM64)
+#  ifdef __aarch64__
 #    define LG_QUANTUM		4
 #  endif
 #  ifdef __hppa__
-#    define LG_QUANTUM		4
-#  endif
-#  ifdef __loongarch__
 #    define LG_QUANTUM		4
 #  endif
 #  ifdef __m68k__
 #    define LG_QUANTUM		3
 #  endif
 #  ifdef __mips__
-#    if defined(__mips_n32) || defined(__mips_n64)
-#      define LG_QUANTUM		4
-#    else
-#      define LG_QUANTUM		3
-#    endif
+#    define LG_QUANTUM		3
 #  endif
 #  ifdef __nios2__
 #    define LG_QUANTUM		3
@@ -49,7 +42,7 @@
 #  ifdef __or1k__
 #    define LG_QUANTUM		3
 #  endif
-#  if defined(__powerpc__) || defined(__ppc__) || defined(__powerpc64__) || defined(__ppc64__)
+#  ifdef __powerpc__
 #    define LG_QUANTUM		4
 #  endif
 #  if defined(__riscv) || defined(__riscv__)
@@ -67,9 +60,6 @@
 #  endif
 #  ifdef __le32__
 #    define LG_QUANTUM		4
-#  endif
-#  ifdef __arc__
-#    define LG_QUANTUM		3
 #  endif
 #  ifndef LG_QUANTUM
 #    error "Unknown minimum alignment for architecture; specify via "

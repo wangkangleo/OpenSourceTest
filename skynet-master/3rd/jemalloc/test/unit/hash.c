@@ -61,8 +61,8 @@ static void
 hash_variant_verify_key(hash_variant_t variant, uint8_t *key) {
 	const int hashbytes = hash_variant_bits(variant) / 8;
 	const int hashes_size = hashbytes * 256;
-	VARIABLE_ARRAY_UNSAFE(uint8_t, hashes, hashes_size);
-	VARIABLE_ARRAY_UNSAFE(uint8_t, final, hashbytes);
+	VARIABLE_ARRAY(uint8_t, hashes, hashes_size);
+	VARIABLE_ARRAY(uint8_t, final, hashbytes);
 	unsigned i;
 	uint32_t computed, expected;
 
@@ -115,11 +115,8 @@ hash_variant_verify_key(hash_variant_t variant, uint8_t *key) {
 	} default: not_reached();
 	}
 
-	computed =
-	    ((uint32_t)final[0] << 0) |
-	    ((uint32_t)final[1] << 8) |
-	    ((uint32_t)final[2] << 16) |
-	    ((uint32_t)final[3] << 24);
+	computed = (final[0] << 0) | (final[1] << 8) | (final[2] << 16) |
+	    (final[3] << 24);
 
 	switch (variant) {
 #ifdef JEMALLOC_BIG_ENDIAN
@@ -134,7 +131,7 @@ hash_variant_verify_key(hash_variant_t variant, uint8_t *key) {
 	default: not_reached();
 	}
 
-	expect_u32_eq(computed, expected,
+	assert_u32_eq(computed, expected,
 	    "Hash mismatch for %s(): expected %#x but got %#x",
 	    hash_variant_string(variant), expected, computed);
 }

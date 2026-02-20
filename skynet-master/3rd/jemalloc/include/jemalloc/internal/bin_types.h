@@ -1,10 +1,9 @@
 #ifndef JEMALLOC_INTERNAL_BIN_TYPES_H
 #define JEMALLOC_INTERNAL_BIN_TYPES_H
 
-#include "jemalloc/internal/jemalloc_preamble.h"
 #include "jemalloc/internal/sc.h"
 
-#define BIN_SHARDS_MAX (1 << EDATA_BITS_BINSHARD_WIDTH)
+#define BIN_SHARDS_MAX (1 << EXTENT_BITS_BINSHARD_WIDTH)
 #define N_BIN_SHARDS_DEFAULT 1
 
 /* Used in TSD static initializer only. Real init in arena_bind(). */
