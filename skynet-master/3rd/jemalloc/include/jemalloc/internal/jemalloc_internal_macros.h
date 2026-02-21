@@ -4,7 +4,11 @@
 #ifdef JEMALLOC_DEBUG
 #  define JEMALLOC_ALWAYS_INLINE static inline
 #else
-#  define JEMALLOC_ALWAYS_INLINE JEMALLOC_ATTR(always_inline) static inline
+#  ifdef _MSC_VER
+#    define JEMALLOC_ALWAYS_INLINE static __forceinline
+#  else
+#    define JEMALLOC_ALWAYS_INLINE JEMALLOC_ATTR(always_inline) static inline
+#  endif
 #endif
 #ifdef _MSC_VER
 #  define inline _inline
@@ -33,19 +37,14 @@
 /* Various function pointers are static and immutable except during testing. */
 #ifdef JEMALLOC_JET
 #  define JET_MUTABLE
+#  define JET_EXTERN extern
 #else
 #  define JET_MUTABLE const
+#  define JET_EXTERN static
 #endif
 
 #define JEMALLOC_VA_ARGS_HEAD(head, ...) head
 #define JEMALLOC_VA_ARGS_TAIL(head, ...) __VA_ARGS__
-
-#if (defined(__GNUC__) || defined(__GNUG__)) && !defined(__clang__) \
-  && defined(JEMALLOC_HAVE_ATTR) && (__GNUC__ >= 7)
-#define JEMALLOC_FALLTHROUGH JEMALLOC_ATTR(fallthrough);
-#else
-#define JEMALLOC_FALLTHROUGH /* falls through */
-#endif
 
 /* Diagnostic suppression macros */
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -53,8 +52,10 @@
 #  define JEMALLOC_DIAGNOSTIC_POP __pragma(warning(pop))
 #  define JEMALLOC_DIAGNOSTIC_IGNORE(W) __pragma(warning(disable:W))
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_MISSING_STRUCT_FIELD_INITIALIZERS
+#  define JEMALLOC_DIAGNOSTIC_IGNORE_FRAME_ADDRESS
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_TYPE_LIMITS
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_ALLOC_SIZE_LARGER_THAN
+#  define JEMALLOC_DIAGNOSTIC_IGNORE_DEPRECATED
 #  define JEMALLOC_DIAGNOSTIC_DISABLE_SPURIOUS
 /* #pragma GCC diagnostic first appeared in gcc 4.6. */
 #elif (defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && \
@@ -82,6 +83,8 @@
 #    define JEMALLOC_DIAGNOSTIC_IGNORE_MISSING_STRUCT_FIELD_INITIALIZERS
 #  endif
 
+#  define JEMALLOC_DIAGNOSTIC_IGNORE_FRAME_ADDRESS  \
+     JEMALLOC_DIAGNOSTIC_IGNORE("-Wframe-address")
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_TYPE_LIMITS  \
      JEMALLOC_DIAGNOSTIC_IGNORE("-Wtype-limits")
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_UNUSED_PARAMETER \
@@ -92,6 +95,12 @@
 #  else
 #    define JEMALLOC_DIAGNOSTIC_IGNORE_ALLOC_SIZE_LARGER_THAN
 #  endif
+#  ifdef JEMALLOC_HAVE_ATTR_DEPRECATED
+#    define JEMALLOC_DIAGNOSTIC_IGNORE_DEPRECATED \
+       JEMALLOC_DIAGNOSTIC_IGNORE("-Wdeprecated-declarations")
+#  else
+#    define JEMALLOC_DIAGNOSTIC_IGNORE_DEPRECATED
+#  endif
 #  define JEMALLOC_DIAGNOSTIC_DISABLE_SPURIOUS \
   JEMALLOC_DIAGNOSTIC_PUSH \
   JEMALLOC_DIAGNOSTIC_IGNORE_UNUSED_PARAMETER
@@ -100,10 +109,30 @@
 #  define JEMALLOC_DIAGNOSTIC_POP
 #  define JEMALLOC_DIAGNOSTIC_IGNORE(W)
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_MISSING_STRUCT_FIELD_INITIALIZERS
+#  define JEMALLOC_DIAGNOSTIC_IGNORE_FRAME_ADDRESS
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_TYPE_LIMITS
 #  define JEMALLOC_DIAGNOSTIC_IGNORE_ALLOC_SIZE_LARGER_THAN
+#  define JEMALLOC_DIAGNOSTIC_IGNORE_DEPRECATED
 #  define JEMALLOC_DIAGNOSTIC_DISABLE_SPURIOUS
 #endif
+
+#ifdef __clang_analyzer__
+#  define JEMALLOC_CLANG_ANALYZER
+#endif
+
+#ifdef JEMALLOC_CLANG_ANALYZER
+#  define JEMALLOC_CLANG_ANALYZER_SUPPRESS __attribute__((suppress))
+#  define JEMALLOC_CLANG_ANALYZER_SILENCE_INIT(v) = v
+#else
+#  define JEMALLOC_CLANG_ANALYZER_SUPPRESS
+#  define JEMALLOC_CLANG_ANALYZER_SILENCE_INIT(v)
+#endif
+
+#define JEMALLOC_SUPPRESS_WARN_ON_USAGE(...) \
+   JEMALLOC_DIAGNOSTIC_PUSH \
+   JEMALLOC_DIAGNOSTIC_IGNORE_DEPRECATED \
+   __VA_ARGS__ \
+   JEMALLOC_DIAGNOSTIC_POP
 
 /*
  * Disables spurious diagnostics for all headers.  Since these headers are not
