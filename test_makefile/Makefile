@@ -135,8 +135,77 @@ new_contents = "放在 .EXPORT_ALL_VARIABLES 底下可以直接变成全局的�
 #SHELL=/home/wangkang/Code  #改shell的目录
 
 
-#下面是逻辑部分 (条件和函数)  #等待后续添加
+#下面是 字符串 及 逻辑部分(条件和函数) 
+foo = ok
+nullstring2 =
+foo2 = $(nullstring2) # end of line; there is a space here
+bar := ${subst not,"totally", "I am not superman"}# 字符串替换(not 替换为 totally)
+comma := ,# ,符号前面的空格会被忽视 而后面的空格不会被忽视
+empty:=
+space := $(empty) $(empty)
+foo3 := a b c
+bar3 := $(subst $(space),$(comma),$(foo3))# bar := $(subst $(space), $(comma) , $(foo)) # Watch out! 如果这样,$(comma)后面的空格会被替换进去
 
+foo4 := a.o b.o l.a c.o
+one4 := $(patsubst %.o,%.c,$(foo4))# 字符串替换(%.o匹配)
+# This is a shorthand for the above
+two4 := $(foo4:%.o=%.c)
+# This is the suffix-only shorthand, and is also equivalent to the above.
+three4 := $(foo4:.o=.c)
+
+bar5 := $(foreach wrd,$(foo4),$(wrd)!)# 通过 foreach 添加感叹号
+
+foo6 := $(if this-is-not-empty,then!,else!)# 类似三目运算符?:
+
+sweet_new_fn = Variable Name: $(0) First: $(1) Second: $(2)# $(0)是变量名(即sweet_new_fn) $(1)开始为参数
+
+test_logic:
+ifeq ($(foo), ok)
+	@echo "foo equals ok"
+else
+	@echo "nope"
+endif
+ifeq ($(strip $(foo2)),)     #去除两端空格
+	@echo "foo is empty after being stripped"
+endif
+ifeq ($(nullstring2),)
+	@echo "nullstring doesn't even have spaces"
+endif
+ifdef foo
+	@echo "foo is defined"
+endif
+
+	@echo $(bar)
+
+	@echo $(bar3)
+
+	@echo $(one4)
+	@echo $(two4)
+	@echo $(three4)
+
+	@echo $(bar5)
+
+	@echo $(foo6)
+
+	@echo $(call sweet_new_fn, 1, 2)# 函数
+
+	@echo $(shell ls -la)# 调用shell函数 #会将输出内容的换行符替换为空格 Very ugly because the newlines are gone!
+
+	@echo 同时过滤两个: $(filter %.o %.res, $(object2))
+	@echo 除.h文件外:  $(filter-out %.h, $(object2))
+	@echo 以.o结尾但不以a开头的文件:  $(filter %.o, $(filter-out a%, $(object2)))
+
+
+.DELETE_ON_ERROR:#错误时删除
+all7: one7 two7
+
+one7:
+	touch one7
+	false
+
+two7:
+	touch two7
+	false
 
 
 clean:
