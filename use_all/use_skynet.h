@@ -9,8 +9,8 @@ class UseSkynet
     UseSkynet();
     ~UseSkynet();
 
-    void Init();
-    void Run();
+    void init();
+    void run();
 
 };
 

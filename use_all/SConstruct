@@ -1,16 +1,22 @@
+import os, sys
+
 root_path= os.getcwd() + "/../"
 print("root_path: "+ root_path)
 
-cpp_options=["-g", "-o0", "-std=gnu++17"]
+cpp_options=["-g", "-std=gnu++17"]
 cpp_path=[
+    os.path.join(root_path, "use_all"),
+    os.path.join(root_path, "use_all/manager"),
     os.path.join(root_path, "skynet-master"),
-    os.path.join(root_path, "spdlog-1.17.0"),
+    os.path.join(root_path, "spdlog-1.17.0/include"),
     os.path.join(root_path, "muduo-master"),
 ]
 
+cpp_srcs=Glob('./*.cpp') + Glob('manager/*.cpp')
+
 env = Environment(CCFLAGS = cpp_options, CPPPATH = cpp_path)   #全局环境变量
 
-env.Program("App","./main.cpp")
+env.Program("App",cpp_srcs)
 
 bld = Builder
 {

@@ -10,11 +10,11 @@ UseSkynet::~UseSkynet()
 
 }
 
-void UseSkynet::Init()
+void UseSkynet::init()
 {
 
 }
-void UseSkynet::Run()
+void UseSkynet::run()
 {
     
 }
