@@ -19,6 +19,6 @@ bool UsespdLog::init()
 
 bool UsespdLog::run()
 {
-    logger_inst -> test_basic();
+    logger_inst -> test();
     return true;
 }

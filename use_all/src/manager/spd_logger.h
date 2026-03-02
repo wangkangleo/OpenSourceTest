@@ -1,11 +1,16 @@
 #pragma once
 
+#include <thread>
+
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h" 
 #include "spdlog/fmt/ostr.h" 
 #include "spdlog/async.h"
+#include "spdlog/details/log_msg.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/daily_file_sink.h"
+#include "spdlog/sinks/hourly_file_sink.h"
 
 class spdLogger
 {
@@ -17,5 +22,5 @@ public:
     spdLogger(const spdLogger&) = delete;
     spdLogger& operator=(const spdLogger&) = delete;
 
-    bool test_basic();
+    bool test();
 };
