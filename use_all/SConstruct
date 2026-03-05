@@ -3,7 +3,7 @@ import os, sys
 root_path= os.getcwd() + "/../"
 print("root_path: "+ root_path)
 
-cpp_options=["-g", "-std=gnu++17"]
+cpp_options=["-g", "-std=gnu++20"]
 cpp_path=[
     os.path.join(root_path, "use_all/src"),
     os.path.join(root_path, "use_all/src/manager"),

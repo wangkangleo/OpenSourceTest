@@ -12,5 +12,10 @@ int main(int argc, char ** argv)
         use_log.run();
     }
 
+    while(true)
+    {
+        Sleep(1000);
+    }
+
     return 0;
 }
