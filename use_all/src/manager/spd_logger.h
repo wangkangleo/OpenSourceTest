@@ -14,7 +14,7 @@
 #include "spdlog/sinks/daily_file_sink.h"
 #include "spdlog/sinks/hourly_file_sink.h"
 #include "spdlog/fmt/bundled/printf.h"
-
+#include "spdlog/fmt/bundled/format.h"
 
 class spdLogger
 {
@@ -35,3 +35,5 @@ public:
 private:
     std::shared_ptr<spdlog::logger> m_logger;
 };
+
+

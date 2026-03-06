@@ -8,6 +8,12 @@
 #define DebugLog(format, ...) logger_inst->debug(format, ##__VA_ARGS__);
 #define InfoLog(format, ...) logger_inst->info(fmt::v12::sprintf(format, ##__VA_ARGS__));
 
+enum test_enum
+{
+    one=1,
+    two =2,
+};
+
 class UsespdLog
 {
 public:
@@ -17,6 +23,7 @@ public:
     bool init();
     bool run();
 
+    void test(int num);
 };
 
 

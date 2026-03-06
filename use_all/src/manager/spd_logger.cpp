@@ -37,10 +37,6 @@ bool spdLogger::test()
                      SPDLOG_VER_PATCH);
 
 
-    for (int i = 1; i < 101; ++i) {
-        m_logger->info("Async message %d, i hope %s", i, "success");
-    }
-
 
     return true;
 }
