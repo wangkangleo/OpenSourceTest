@@ -1161,7 +1161,7 @@ struct use_format_as_member<
 
 template <typename T, typename U = remove_const_t<T>>
 using use_formatter =
-    bool_constant<(std::is_class<T>::value || std::is_enum<T>::value ||
+    bool_constant<(std::is_class<T>::value || /*std::is_enum<T>::value ||*/
                    std::is_union<T>::value || std::is_array<T>::value) &&
                   !has_to_string_view<T>::value && !is_named_arg<T>::value &&
                   !use_format_as<T>::value && !use_format_as_member<U>::value>;
@@ -2284,6 +2284,11 @@ template <typename Context> class value {
 
   FMT_ALWAYS_INLINE value(const named_arg_info<char_type>* args, size_t size)
       : named_args{args, size} {}
+
+  template<typename Enum, 
+         typename std::enable_if<std::is_enum<Enum>::value, int>::type = 0>
+  constexpr FMT_INLINE value(Enum e) 
+    : int_value(static_cast<int>(e)) {}
 
  private:
   template <typename T, FMT_ENABLE_IF(has_formatter<T, char_type>())>
