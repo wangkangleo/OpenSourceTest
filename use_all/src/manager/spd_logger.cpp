@@ -11,6 +11,7 @@
 #include "spdlog/fmt/bundled/printf.h"
 #include "spdlog/fmt/bundled/format.h"
 
+std::string spdLogger::m_logger_name = "unname_log";
 
 spdLogger::spdLogger()
 {
@@ -33,7 +34,8 @@ void spdLogger::init()
     spdlog::init_thread_pool(8192,2);
     spdlog::flush_every(std::chrono::seconds(2));
 
-    auto sink = std::make_shared<spdlog::sinks::hourly_file_sink_mt>("logs/log");
+    std::string file_name = "logs/";
+    auto sink = std::make_shared<spdlog::sinks::hourly_file_sink_mt>((file_name+m_logger_name).c_str());
     sink -> set_level(spdlog::level::trace);
 
     m_logger = std::make_shared<spdlog::logger>("spd_logger",spdlog::sinks_init_list({sink}));
