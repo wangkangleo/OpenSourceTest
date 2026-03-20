@@ -21,8 +21,8 @@ bool UsespdLog::init()
 struct fmt::formatter<T, char, fmt::printf_context> 
     : fmt::internal::printf_arg_formatter<fmt::buffer_context<char>> {
     
-    // 注意：printf_arg_formatter 没有 parse 方法
-    // 我们只需要实现 format 方法
+    // 注锟解：printf_arg_formatter 没锟斤拷 parse 锟斤拷锟斤拷
+    // 锟斤拷锟斤拷只锟斤拷要实锟斤拷 format 锟斤拷锟斤拷
     
     template <typename Context>
     auto format(const T& value, Context& ctx) const -> decltype(ctx.out()) {
@@ -37,12 +37,12 @@ struct fmt::formatter<T, char, fmt::printf_context>
 void UsespdLog::test(test_enum num)
 {
     //InfoLog("ce shi liang xia, %s, zhe shi shenm me", "????",(int)num);
-    std::string str = Sprintf("ce shi liang xia, %s, zhe shi shenm me, %d", "????",num);
+    //std::string str = Sprintf("ce shi liang xia, %s, zhe shi shenm me, %d", "????",(int)num);
 }
 
 bool UsespdLog::run()
 {
-    logger_inst -> test();
+    //logger_inst -> test();
 
     test(two);
 

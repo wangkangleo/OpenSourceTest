@@ -1,5 +1,16 @@
 #include "spd_logger.h"
     
+#include "spdlog/cfg/env.h" 
+#include "spdlog/fmt/ostr.h" 
+#include "spdlog/async.h"
+#include "spdlog/details/log_msg.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/daily_file_sink.h"
+#include "spdlog/sinks/hourly_file_sink.h"
+#include "spdlog/fmt/bundled/printf.h"
+#include "spdlog/fmt/bundled/format.h"
+
 
 spdLogger::spdLogger()
 {
@@ -29,28 +40,4 @@ void spdLogger::init()
 
     spdlog::initialize_logger(m_logger);
     spdlog::set_default_logger(m_logger);
-}
-
-bool spdLogger::test()
-{
-    spdlog::info("Welcome to spdlog version {}.{}.{}  !", SPDLOG_VER_MAJOR, SPDLOG_VER_MINOR,
-                     SPDLOG_VER_PATCH);
-
-
-
-    return true;
-}
-
-bool spdLogger::debug(const char* format, ...)
-{
-    //std::string msg = fmt::sprintf(fmt::v12::string_view(format),);
-    return true;
-}
-
-
-bool spdLogger::info(std::string msg)
-{
-    m_logger->info(msg);
-
-    return true;
 }

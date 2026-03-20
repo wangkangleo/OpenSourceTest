@@ -5,16 +5,7 @@
 #include <thread>
 
 #include "spdlog/spdlog.h"
-#include "spdlog/cfg/env.h" 
-#include "spdlog/fmt/ostr.h" 
-#include "spdlog/async.h"
-#include "spdlog/details/log_msg.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/sinks/daily_file_sink.h"
-#include "spdlog/sinks/hourly_file_sink.h"
-#include "spdlog/fmt/bundled/printf.h"
-#include "spdlog/fmt/bundled/format.h"
+
 
 class spdLogger
 {
@@ -27,13 +18,15 @@ public:
     spdLogger(const spdLogger&) = delete;
     spdLogger& operator=(const spdLogger&) = delete;
 
-    bool test();
-    bool debug(const char* format, ...);
-
-    bool info(std::string msg);
 
 private:
     std::shared_ptr<spdlog::logger> m_logger;
 };
 
-
+#define logger_inst spdLogger::get_logger_inst()  
+#define TraceLog(format, ...) logger_inst->trace(format, ##__VA_ARGS__);
+#define DebugLog(format, ...) logger_inst->debug(format, ##__VA_ARGS__);
+#define InfoLog(format, ...) logger_inst->info(format, ##__VA_ARGS__);
+#define WarnLog(format, ...) logger_inst->warn(format, ##__VA_ARGS__);
+#define ErrorLog(format, ...) logger_inst->error(format, ##__VA_ARGS__);
+#define CriticalLog(format, ...) logger_inst->critical(format, ##__VA_ARGS__);
