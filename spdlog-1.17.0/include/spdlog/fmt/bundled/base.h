@@ -2632,7 +2632,12 @@ template <typename Context> class basic_format_args {
   constexpr FMT_ALWAYS_INLINE basic_format_args(
       const store<NUM_ARGS, NUM_NAMED_ARGS, DESC>& s)
       : desc_(DESC | (NUM_NAMED_ARGS != 0 ? +detail::has_named_args_bit : 0)),
-        values_(s.args) {}
+        values_(s.args) 
+        {
+          int now_desc = desc_;
+          int test_tt = 0;
+          test_tt += 5;
+        }
 
   template <int NUM_ARGS, int NUM_NAMED_ARGS, unsigned long long DESC,
             FMT_ENABLE_IF(NUM_ARGS > detail::max_packed_args)>

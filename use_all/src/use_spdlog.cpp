@@ -13,7 +13,7 @@ UsespdLog::~UsespdLog()
 
 bool UsespdLog::init()
 {
-
+    logger_inst->set_logger_name("test");
     return true;
 }
 
@@ -46,9 +46,8 @@ bool UsespdLog::run()
 
     test(two);
 
-    unsigned short test_hort = 666;
-    const char * test_char = "777";
-    //InfoLog("ce shi yixia,%d,%s,%hu,%s",111,"222",test_hort,test_char);
+    InfoLog2("ce shi yixia, %p", this);
+    //InfoLog2("ce shi yixia, %d", 666);
 
     return true;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "spdlog/spdlog.h"
+#include "spdlog/fmt/bundled/printf.h"
 
 #include <thread>
 #include <string>
@@ -30,3 +31,5 @@ private:
 #define WarnLog(format, ...) logger_inst->get_logger()->warn(format, ##__VA_ARGS__);
 #define ErrorLog(format, ...) logger_inst->get_logger()->error(format, ##__VA_ARGS__);
 #define CriticalLog(format, ...) logger_inst->get_logger()->critical(format, ##__VA_ARGS__);
+
+#define InfoLog2(format, ...) logger_inst->get_logger()->info(fmt::v12::sprintf(format, ##__VA_ARGS__));
