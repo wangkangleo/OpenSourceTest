@@ -383,7 +383,7 @@ inline auto parse_printf_presentation_type(char c, type t, bool& upper)
   case 'a': return in(t, float_set) ? pt::hexfloat : pt::none;
   case 'c': return in(t, integral_set) ? pt::chr : pt::none;
   case 's': return in(t, string_set | cstring_set) ? pt::string : pt::none;
-  case 'p': return in(t, pointer_set | cstring_set) ? pt::pointer : pt::none;
+  case 'p': return pt::hex;//return in(t, pointer_set | cstring_set) ? pt::pointer : pt::none;
   default:  return pt::none;
   }
 }
@@ -500,6 +500,7 @@ void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
       // printf produces garbage when 'L' is omitted for long double, no
       // need to do the same.
       break;
+    case 'p': convert_arg<unsigned long long>(arg, t);
     default: --it; convert_arg<void>(arg, c);
     }
 

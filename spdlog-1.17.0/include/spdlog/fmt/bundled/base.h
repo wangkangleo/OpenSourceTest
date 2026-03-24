@@ -2262,12 +2262,12 @@ template <typename Context> class value {
 
   template <typename T, FMT_ENABLE_IF(std::is_pointer<T>::value ||
                                       std::is_member_pointer<T>::value)>
-  value(const T&) {
+  value(const T& x):ulong_long_value((uintptr_t)x) {
     // Formatting of arbitrary pointers is disallowed. If you want to format a
     // pointer cast it to `void*` or `const void*`. In particular, this forbids
     // formatting of `[const] volatile char*` printed as bool by iostreams.
-    static_assert(sizeof(T) == 0,
-                  "formatting of non-void pointers is disallowed");
+    //static_assert(sizeof(T) == 0,
+    //              "formatting of non-void pointers is disallowed");
   }
 
   template <typename T, FMT_ENABLE_IF(use_format_as<T>::value)>
