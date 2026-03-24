@@ -17,6 +17,7 @@ public:
     spdLogger& operator=(const spdLogger&) = delete;
 
     inline spdlog::logger* get_logger(){return m_logger.get();}
+    inline static void set_logger_name(const char* name){m_logger_name = name;}
 private:
     std::shared_ptr<spdlog::logger> m_logger;
     static std::string m_logger_name;

@@ -15,7 +15,7 @@ std::string spdLogger::m_logger_name = "unname_log";
 
 spdLogger::spdLogger()
 {
-
+    init();
 }
 
 spdLogger * spdLogger::get_logger_inst()
@@ -35,7 +35,14 @@ void spdLogger::init()
     spdlog::flush_every(std::chrono::seconds(2));
 
     std::string file_name = "logs/";
-    auto sink = std::make_shared<spdlog::sinks::hourly_file_sink_mt>((file_name+m_logger_name).c_str());
+    file_name += m_logger_name;
+
+    spdlog::file_event_handlers handlers;
+    handlers.after_open = [file_name](spdlog::filename_t filename, std::FILE* fstream){
+
+    };
+
+    auto sink = std::make_shared<spdlog::sinks::hourly_file_sink_mt>((file_name).c_str(),false,0,handlers);
     sink -> set_level(spdlog::level::trace);
 
     m_logger = std::make_shared<spdlog::logger>("spd_logger",spdlog::sinks_init_list({sink}));
