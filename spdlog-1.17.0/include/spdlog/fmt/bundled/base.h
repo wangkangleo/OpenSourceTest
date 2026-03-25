@@ -2262,12 +2262,12 @@ template <typename Context> class value {
 
   template <typename T, FMT_ENABLE_IF(std::is_pointer<T>::value ||
                                       std::is_member_pointer<T>::value)>
-  value(const T& x):ulong_long_value((uintptr_t)x) {
+  value(const T&) {
     // Formatting of arbitrary pointers is disallowed. If you want to format a
     // pointer cast it to `void*` or `const void*`. In particular, this forbids
     // formatting of `[const] volatile char*` printed as bool by iostreams.
-    //static_assert(sizeof(T) == 0,
-    //              "formatting of non-void pointers is disallowed");
+    static_assert(sizeof(T) == 0,
+                  "formatting of non-void pointers is disallowed");
   }
 
   template <typename T, FMT_ENABLE_IF(use_format_as<T>::value)>
@@ -2632,12 +2632,7 @@ template <typename Context> class basic_format_args {
   constexpr FMT_ALWAYS_INLINE basic_format_args(
       const store<NUM_ARGS, NUM_NAMED_ARGS, DESC>& s)
       : desc_(DESC | (NUM_NAMED_ARGS != 0 ? +detail::has_named_args_bit : 0)),
-        values_(s.args) 
-        {
-          int now_desc = desc_;
-          int test_tt = 0;
-          test_tt += 5;
-        }
+        values_(s.args) {}
 
   template <int NUM_ARGS, int NUM_NAMED_ARGS, unsigned long long DESC,
             FMT_ENABLE_IF(NUM_ARGS > detail::max_packed_args)>
