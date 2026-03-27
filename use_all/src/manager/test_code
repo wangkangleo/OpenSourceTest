@@ -1,0 +1,8 @@
+//-----------测试代码----------
+
+//日志部分
+#define InfoLog2(format, ...) logger_inst->get_logger()->info(fmt::sprintf(format, ##__VA_ARGS__));
+void spdLogger::test()
+{
+    InfoLog2("test InfoLog2 0x%llx",(uintptr_t)this);
+}
