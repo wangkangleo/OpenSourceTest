@@ -12,9 +12,30 @@ cpp_path=[
     os.path.join(root_path, "muduo-master"),
 ]
 
-cpp_srcs=Glob('./src/*.cpp') + Glob('./src/manager/*.cpp')
 
-env = Environment(CCFLAGS = cpp_options, CPPPATH = cpp_path)   #ȫ�ֻ�������
+lib_path=[]
+libs=[]
+
+#集成boost库
+cpp_path.append(os.path.join(root_path, "boost/include"))
+boost_lib_path = os.path.join(root_path, "boost/lib")
+lib_path.append(boost_lib_path)
+boost_libs = ['boost_system', 'boost_filesystem']  # 需要链接的 Boost 静态库（不要写 lib 前缀和 .a）
+libs.extend(boost_libs)
+
+
+
+env = Environment(CCFLAGS = cpp_options, CPPPATH = cpp_path, LIBPATH = lib_path, LIBS = libs)   #全局环境变量
+
+
+# 构建到 build 目录
+build_dir = 'build'
+env.VariantDir(build_dir, 'src', duplicate=0)  # src → build 映射
+
+
+# 收集cpp源文件
+cpp_srcs=Glob(build_dir + '/*.cpp') + Glob(build_dir + '/manager/*.cpp')
+
 
 env.Program("App",cpp_srcs)
 
