@@ -1,5 +1,5 @@
 #include "use_boost.h"
-
+#include "manager/network_manager.h"
 
 UseBoost::UseBoost()
 {
@@ -17,6 +17,9 @@ bool UseBoost::init()
 void UseBoost::run()
 {
     filesystem();
+
+    NetworkManager network_manager;
+    network_manager.start();
 }
 void UseBoost::filesystem()
 {
